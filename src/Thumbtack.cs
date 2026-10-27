@@ -1,24 +1,42 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 namespace ScreenLine
 {
     internal sealed class Thumbtack : Canvas
     {
+        // 与绳子上的角色图同一取图顺序，保证同一张照片在绳子与桌面上是同一个角色。
+        // 高度取 40：40-24（浮窗上边距）=16px 压住照片上沿，且留出按钮上抬 4px 的余量不被窗口裁掉。
+        const double PortraitHeight = 40;
+        public bool UsePortrait { get; set; }
         public LineTheme Appearance { get; private set; }
 
         public Thumbtack()
         {
             Width = Height = 32;
             IsHitTestVisible = false;
+            UsePortrait = true;
         }
 
         public void Apply(LineTheme theme, int colorIndex)
         {
             Appearance = theme;
             Children.Clear();
+            BitmapSource portrait = UsePortrait ? ClipArt.For(colorIndex) : null;
+            // 贴图窗口顶部之外会被裁掉，角色从画布顶边起画、向下压住照片上沿。
+            if (portrait != null)
+            {
+                double box = ClipArt.BoxFor(PortraitHeight);
+                var image = new Image { Source = portrait, Width = box, Height = box,
+                    Stretch = Stretch.Fill, IsHitTestVisible = false };
+                RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.HighQuality);
+                SetLeft(image, (Width - box) / 2); SetTop(image, -box * ClipArt.TopFraction);
+                Children.Add(image);
+                return;
+            }
             Color color = (Color)ColorConverter.ConvertFromString(theme.ClipColors[colorIndex % theme.ClipColors.Length]);
             Color light = Color.FromRgb((byte)(color.R + (255 - color.R) * 0.65), (byte)(color.G + (255 - color.G) * 0.65), (byte)(color.B + (255 - color.B) * 0.65));
             Color dark = Color.FromRgb((byte)(color.R * 0.67), (byte)(color.G * 0.67), (byte)(color.B * 0.67));

@@ -50,7 +50,7 @@ namespace ScreenLine
         internal readonly Button TextButton = new Button();
         readonly EnvelopeIcon envelopeImage = new EnvelopeIcon { Width = 96, Height = 86, Stretch = Stretch.Fill, IsHitTestVisible = false };
         readonly Canvas basketHolder, textHolder;
-        readonly ClothesClip textClip = new ClothesClip();
+        readonly ClothesClip textClip = new ClothesClip { UsePortrait = false };
         readonly TextBlock textCount = new TextBlock { FontFamily = new FontFamily("Segoe UI"), FontSize = 13, FontWeight = FontWeights.SemiBold, Foreground = Brushes.White, TextAlignment = TextAlignment.Center };
         readonly Border textCounter = new Border();
         public event Action TextRequested;

@@ -3,14 +3,21 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 namespace ScreenLine
 {
     internal sealed class ClothesClip : Canvas
     {
+        // 角色图高度与底边（卡片坐标）。底边压在照片上沿下方 8px，向上溢出画布，
+        // 因此不必改动 ShelfWindow 里的挂点与点击热区。
+        const double PortraitHeight = 44, PortraitBottom = 35;
+
         readonly RotateTransform front = new RotateTransform(0, 10, 14), back = new RotateTransform(0, 10, 14);
-        bool opened;
+        readonly ScaleTransform portraitScale = new ScaleTransform(1, 1);
+        bool opened, portrait;
+        public bool UsePortrait { get; set; }
         public LineTheme Appearance { get; private set; }
 
         public ClothesClip() : this(LineTheme.All[0], 0) { }
@@ -18,6 +25,7 @@ namespace ScreenLine
         public ClothesClip(LineTheme theme, int colorIndex)
         {
             Width = 16; Height = 30; IsHitTestVisible = false;
+            UsePortrait = true;
             Apply(theme, colorIndex);
         }
 
@@ -25,6 +33,10 @@ namespace ScreenLine
         {
             Appearance = theme;
             Children.Clear();
+            portraitScale.BeginAnimation(ScaleTransform.ScaleXProperty, null);
+            portraitScale.BeginAnimation(ScaleTransform.ScaleYProperty, null);
+            portrait = UsePortrait && ClipArt.Count > 0;
+            if (portrait) { ApplyPortrait(ClipArt.For(colorIndex)); return; }
             string color = theme.ClipColors[colorIndex % theme.ClipColors.Length];
             bool wood = theme.Id == "linen", metal = theme.Id == "classic" || theme.Id == "graphite";
             double x = wood ? 1.5 : (theme.Id == "color" ? 1.5 : 3), width = wood ? 10 : (theme.Id == "color" ? 11.5 : 9.5);
@@ -78,6 +90,19 @@ namespace ScreenLine
             front.Angle = opened ? 7 : 0; back.Angle = opened ? -5 : 0;
         }
 
+        void ApplyPortrait(BitmapSource source)
+        {
+            double box = ClipArt.BoxFor(PortraitHeight);
+            var image = new Image {
+                Source = source, Width = box, Height = box, Stretch = Stretch.Fill, IsHitTestVisible = false,
+                RenderTransformOrigin = new Point(0.5, ClipArt.BottomFraction), RenderTransform = portraitScale
+            };
+            RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.HighQuality);
+            SetLeft(image, (Width - box) / 2); SetTop(image, PortraitBottom - box * ClipArt.BottomFraction);
+            Children.Add(image);
+            portraitScale.ScaleX = portraitScale.ScaleY = opened ? 1.08 : 1;
+        }
+
         static Brush Shade(string value, double amount)
         {
             Color color = (Color)ColorConverter.ConvertFromString(value);
@@ -89,6 +114,13 @@ namespace ScreenLine
         public void Open()
         {
             opened = true;
+            if (portrait)
+            {
+                var lift = new DoubleAnimation(1.1, TimeSpan.FromSeconds(0.10)) { EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut } };
+                portraitScale.BeginAnimation(ScaleTransform.ScaleXProperty, lift);
+                portraitScale.BeginAnimation(ScaleTransform.ScaleYProperty, lift);
+                return;
+            }
             front.BeginAnimation(RotateTransform.AngleProperty, new DoubleAnimation(7, TimeSpan.FromSeconds(0.10)) { EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut } });
             back.BeginAnimation(RotateTransform.AngleProperty, new DoubleAnimation(-5, TimeSpan.FromSeconds(0.10)) { EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut } });
         }
@@ -96,6 +128,13 @@ namespace ScreenLine
         public void Reset()
         {
             opened = false;
+            if (portrait)
+            {
+                portraitScale.BeginAnimation(ScaleTransform.ScaleXProperty, null);
+                portraitScale.BeginAnimation(ScaleTransform.ScaleYProperty, null);
+                portraitScale.ScaleX = portraitScale.ScaleY = 1;
+                return;
+            }
             front.BeginAnimation(RotateTransform.AngleProperty, null); back.BeginAnimation(RotateTransform.AngleProperty, null);
             front.Angle = back.Angle = 0;
         }
