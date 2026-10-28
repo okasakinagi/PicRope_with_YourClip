@@ -86,6 +86,17 @@ try {
 
     if ($SkipBuild) { Write-Output '（已跳过构建）'; exit 0 }
 
+    $assets = Join-Path $root 'with_yourclip\make-clip-assets.ps1'
+    $images = Join-Path $root 'with_yourclip\images'
+    if ((Test-Path -LiteralPath $assets) -and (Test-Path -LiteralPath $images)) {
+        $count = @(Get-ChildItem -LiteralPath $images -Filter *.png | Where-Object { $_.Name -notlike '_*' }).Count
+        if ($count -gt 0) {
+            Write-Output '重新生成角色素材…'
+            & $assets
+            if ($LASTEXITCODE -ne 0) { Write-Output '素材生成失败。'; exit 1 }
+        }
+    }
+
     $exe = Join-Path $root 'build\PicRope.exe'
     if ((Test-Path -LiteralPath $exe) -and (Get-Process PicRope -ErrorAction SilentlyContinue)) {
         Write-Output '关闭正在运行的程序…'

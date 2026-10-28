@@ -16,10 +16,7 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
-if (-not $SourceDir) {
-    $SourceDir = Join-Path $root 'personal\clips\original'
-    if (-not (Test-Path -LiteralPath $SourceDir)) { $SourceDir = Join-Path $PSScriptRoot 'images' }
-}
+if (-not $SourceDir) { $SourceDir = Join-Path $PSScriptRoot 'images' }
 if (-not $OutputDir) {
     $OutputDir = if ($Local) { Join-Path $root 'personal\local-assets' } else { Join-Path $root 'src\assets' }
 }
@@ -79,3 +76,11 @@ foreach ($file in $files) {
     finally { $source.Dispose() }
 }
 Write-Output ('共 ' + $index + ' 张 → ' + $OutputDir)
+
+# 清掉上一次生成多出来的编号，避免换图后旧角色残留
+$stale = Get-ChildItem -LiteralPath $OutputDir -Filter 'basket-clip*.png' |
+    Where-Object { $_.BaseName -match '^basket-clip(\d+)$' -and [int]$Matches[1] -gt $index }
+foreach ($file in $stale) {
+    Remove-Item -LiteralPath $file.FullName -Force
+    Write-Output ('清理残留：' + $file.Name)
+}
