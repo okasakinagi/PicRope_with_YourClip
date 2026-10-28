@@ -77,10 +77,16 @@ foreach ($file in $files) {
 }
 Write-Output ('共 ' + $index + ' 张 → ' + $OutputDir)
 
-# 清掉上一次生成多出来的编号，避免换图后旧角色残留
-$stale = Get-ChildItem -LiteralPath $OutputDir -Filter 'basket-clip*.png' |
-    Where-Object { $_.BaseName -match '^basket-clip(\d+)$' -and [int]$Matches[1] -gt $index }
-foreach ($file in $stale) {
-    Remove-Item -LiteralPath $file.FullName -Force
-    Write-Output ('清理残留：' + $file.Name)
+# 清掉上一次生成多出来的编号，避免换图后旧角色残留。
+# build\runtime-assets 是上游 prepare-assets.ps1 的增量产物目录，它不会删除旧文件，
+# 残留的图会被编进 exe，所以这里一并清理。
+$staleDirs = @($OutputDir, (Join-Path $root 'build\runtime-assets'))
+foreach ($dir in $staleDirs) {
+    if (-not (Test-Path -LiteralPath $dir)) { continue }
+    $stale = Get-ChildItem -LiteralPath $dir -Filter 'basket-clip*.png' |
+        Where-Object { $_.BaseName -match '^basket-clip(\d+)$' -and [int]$Matches[1] -gt $index }
+    foreach ($file in $stale) {
+        Remove-Item -LiteralPath $file.FullName -Force
+        Write-Output ('清理残留：' + $file.Name)
+    }
 }

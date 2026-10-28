@@ -10,9 +10,9 @@
 
 | 位置 | 作用 |
 | --- | --- |
-| `with_yourclip\images\` | **唯一一份**原始角色图（高清、透明背景），提交进仓库 |
-| `with_yourclip\make-clip-assets.ps1` | 把原图生成为可内嵌的 384×384 素材 |
-| `with_yourclip\README.md` | 本说明 |
+| `yourclip\images\` | **唯一一份**原始角色图（高清、透明背景），提交进仓库 |
+| `yourclip\make-clip-assets.ps1` | 把原图生成为可内嵌的 384×384 素材 |
+| `yourclip\README.md` | 本说明 |
 | `tools\sync.ps1` | 同步上游更新 |
 | `src\ClipArt.cs` 等 4 个源码文件 | 让夹子/图钉支持角色图（见文末清单） |
 
@@ -27,13 +27,13 @@
 
 ## 换成你自己的图（三步）
 
-1. **准备图片**放进 `with_yourclip\images\`：
+1. **准备图片**放进 `yourclip\images\`：
    PNG，**必须有透明通道**（背景抠好的那种），短边 ≥ 160px，角色完整、四周留一点空白。
    JPG 不行（没有透明通道）。命名随意，**按文件名排序编号**，想控制顺序就加 `1-`、`2-` 前缀。
 2. **生成素材**：
 
    ```powershell
-   .\with_yourclip\make-clip-assets.ps1
+   .\yourclip\make-clip-assets.ps1
    ```
 
    自动找出每张图的主体包围盒，按统一比例居中放到 **384×384** 透明画布，
@@ -84,7 +84,7 @@
 > ```powershell
 > git fetch upstream
 > git checkout main; git merge --ff-only upstream/main
-> git checkout custom; git rebase main
+> git checkout with_yourclip; git rebase main
 > ```
 
 ## ⚠️ 关于应用内自动更新
@@ -98,7 +98,7 @@
 ## 素材与许可
 
 - 代码沿用上游的 MIT 许可（见根目录 `LICENSE` / `NOTICE`）。
-- `with_yourclip\images\` 里的角色图为本分支自带，属于原创作品。
+- `yourclip\images\` 里的角色图为本分支自带，属于原创作品。
 - 换成自己的图时，请确认你有权使用并分发。角色图请在授权范围内使用。
 
 ## 本分支的改动清单
@@ -111,4 +111,4 @@
 | `src\ClothesClip.cs` | 夹子支持角色模式（`UsePortrait`），保留原矢量分支 |
 | `src\Thumbtack.cs` | 图钉支持角色模式，与绳子上的角色同序 |
 | `src\ShelfWindow.cs` | **仅 1 行**：信封的夹子关闭角色模式 |
-| `with_yourclip\`、`tools\` | 素材、生成脚本、同步脚本、本说明 |
+| `yourclip\`、`tools\` | 素材、生成脚本、同步脚本、本说明 |

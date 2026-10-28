@@ -86,8 +86,8 @@ try {
 
     if ($SkipBuild) { Write-Output '（已跳过构建）'; exit 0 }
 
-    $assets = Join-Path $root 'with_yourclip\make-clip-assets.ps1'
-    $images = Join-Path $root 'with_yourclip\images'
+    $assets = Join-Path $root 'yourclip\make-clip-assets.ps1'
+    $images = Join-Path $root 'yourclip\images'
     if ((Test-Path -LiteralPath $assets) -and (Test-Path -LiteralPath $images)) {
         $count = @(Get-ChildItem -LiteralPath $images -Filter *.png | Where-Object { $_.Name -notlike '_*' }).Count
         if ($count -gt 0) {

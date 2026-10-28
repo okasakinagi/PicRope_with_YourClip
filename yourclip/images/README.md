@@ -3,7 +3,7 @@
 把**原创**角色图（PNG，透明背景）放进本目录，然后在仓库根目录运行：
 
 ```powershell
-.\with_yourclip\make-clip-assets.ps1
+.\yourclip\make-clip-assets.ps1
 ```
 
 ## 要求
@@ -20,4 +20,14 @@
 
 - 这里是**唯一一份**原始图，会提交进仓库。
 - 生成的 `src\assets\basket-clip*.png` 是构建产物，不进仓库（避免同图存两份）。
+- 换图后请重新运行一次生成脚本，并**清掉 `build\runtime-assets` 里的旧编号**
+  （脚本会自动处理；该目录由上游增量生成，不删旧文件，残留会被编进 exe）。
 - 换成别人的图之前，请确认你有权使用并分发。
+
+## 当前内置
+
+| 文件 | 角色 |
+| --- | --- |
+| `1-brown-hair.png` | 棕发水手服少女 |
+| `2-white-cat-ears.png` | 白发猫耳精灵 |
+| `3-dark-mage.png` | 黑发紫帽小魔女 |
