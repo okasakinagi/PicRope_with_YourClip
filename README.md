@@ -7,18 +7,22 @@
 <p align="center">Windows 截图暂存与桌面贴图工具</p>
 
 <p align="center">
-  <a href="https://github.com/Renly1994/PicRope/releases/latest"><img src="https://img.shields.io/github/v/release/Renly1994/PicRope?style=flat-square&amp;label=release&amp;color=2563eb" alt="最新版本"></a>
+  <a href="https://github.com/okasakinagi/PicRope_with_YourClip/releases/latest"><img src="https://img.shields.io/github/v/release/okasakinagi/PicRope_with_YourClip?style=flat-square&amp;label=release&amp;color=2563eb" alt="最新版本"></a>
   <img src="https://img.shields.io/badge/Windows-10%20%2F%2011-0078d4?style=flat-square" alt="Windows 10 和 11">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-475569?style=flat-square" alt="MIT 许可"></a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/Renly1994/PicRope/releases/latest"><strong>下载 Windows 版</strong></a>
+  <a href="https://github.com/okasakinagi/PicRope_with_YourClip/releases/latest"><strong>下载 Windows 版</strong></a>
   · <a href="#功能">功能</a>
   · <a href="#开始使用">开始使用</a>
   · <a href="#常见问题">常见问题</a>
-  · <a href="https://github.com/Renly1994/PicRope/issues">反馈</a>
+  · <a href="https://github.com/okasakinagi/PicRope_with_YourClip/issues">反馈</a>
 </p>
+
+> **这是个人分支，不是官方版。** 与 [官方 PicRope](https://github.com/Renly1994/PicRope) 的唯一功能差别是：
+> 绳上的夹子和桌面贴图的图钉换成了角色头像（共 3 个，按顺序轮换）。
+> 在外观面板里可一键切回原版夹子；想换成自己的图、或了解与上游的同步方式，见 [yourclip/README.md](yourclip/README.md)。
 
 ![图绳界面拼图：屏幕上沿的截图绳、文字信封、图片篮子与桌面贴图，图片内容为示例](docs/assets/overview-windows.png)
 
@@ -37,7 +41,7 @@ PicRope 将截图暂存在屏幕上沿，单击复制、拖拽取用，也可以
 
 ## 开始使用
 
-1. 从 [Releases 下载最新版](https://github.com/Renly1994/PicRope/releases/latest)，完整解压后运行 `Install.cmd`。
+1. 从 [Releases 下载最新版](https://github.com/okasakinagi/PicRope_with_YourClip/releases/latest)，完整解压后运行 `Install.cmd`。
 2. 启动图绳，用 `Win+PrtScn` 截图。保存到 Windows 截图文件夹的新图片会自动挂上。
 3. 将鼠标移到屏幕上沿展开绳子，单击图片复制，或拖拽到需要的应用。
 

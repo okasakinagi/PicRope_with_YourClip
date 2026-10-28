@@ -11,16 +11,20 @@ namespace ScreenLine
     internal static class ClipArt
     {
         public const double TopFraction = 68 / 384.0, BottomFraction = 244 / 384.0, HeightFraction = 176 / 384.0;
+        // 外观面板的「夹子样式」开关：关掉后整体回退到作者原本的矢量夹子与图钉。
+        public static bool Enabled = true;
         static readonly BitmapSource[] portraits = Load();
 
-        public static int Count { get { return portraits.Length; } }
+        public static int Available { get { return portraits.Length; } }
+
+        public static int Count { get { return Enabled ? portraits.Length : 0; } }
 
         // 想让角色在界面上高 height 时，正方形画布应渲染的边长。
         public static double BoxFor(double height) { return height / HeightFraction; }
 
         public static BitmapSource For(int index)
         {
-            return portraits.Length == 0 ? null : portraits[Math.Abs(index) % portraits.Length];
+            return !Enabled || portraits.Length == 0 ? null : portraits[Math.Abs(index) % portraits.Length];
         }
 
         static BitmapSource[] Load()

@@ -154,6 +154,7 @@ namespace ScreenLine
             line.Children.Add(rope); root.Children.Add(line);
             root.Children.Add(viewport); Content = root;
             Appearance = LineTheme.FromId(gallery.Store.State.Theme);
+            ClipArt.Enabled = !gallery.Store.State.VectorClips;
             RopeLine.Apply(rope, Appearance);
 
             var basket = basketHolder = new Canvas { Width = 156, Height = 220, HorizontalAlignment = HorizontalAlignment.Right, Margin = new Thickness(0, 0, 24, 0), RenderTransform = slide };

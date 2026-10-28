@@ -18,6 +18,8 @@ namespace ScreenLine
         public bool CollectClipboard { get; set; }
         public bool CollectTextClipboard { get; set; }
         public bool AutoHang { get; set; }
+        // 夹子样式：false = 角色头像，true = 作者原版矢量夹子。
+        public bool VectorClips { get; set; }
         public bool HoverPreview { get; set; }
         public string Theme { get; set; }
         public string DisplayDevice { get; set; }

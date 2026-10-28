@@ -21,8 +21,9 @@ namespace ScreenLine
 
     internal sealed class AppUpdates : IDisposable
     {
-        public const string Repository = "https://github.com/Renly1994/PicRope";
-        public const string Endpoint = "https://api.github.com/repos/Renly1994/PicRope/releases/latest";
+        // 分叉版：更新源指向本仓库，避免被作者官方包覆盖掉角色图。
+        public const string Repository = "https://github.com/okasakinagi/PicRope_with_YourClip";
+        public const string Endpoint = "https://api.github.com/repos/okasakinagi/PicRope_with_YourClip/releases/latest";
         public static readonly string CurrentVersion = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false)
             .Cast<AssemblyInformationalVersionAttribute>().Single().InformationalVersion;
         internal static readonly string Cache = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "PicRope", "Updates");

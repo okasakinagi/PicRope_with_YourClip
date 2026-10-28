@@ -11,14 +11,19 @@ namespace ScreenLine
     internal sealed class AppearanceWindow : Window
     {
         readonly Action<LineTheme> apply;
+        readonly Gallery gallery;
         readonly List<TextBlock> selectionMarks = new List<TextBlock>();
+        readonly Button portraitButton, vectorButton;
         internal readonly List<Button> Options = new List<Button>();
+        LineTheme current;
 
         public AppearanceWindow(LineTheme selected, Gallery gallery, Action<LineTheme> apply)
         {
             this.apply = apply;
+            this.gallery = gallery;
+            current = selected;
             Title = "外观";
-            Width = 654; Height = 462;
+            Width = 654; Height = 516;
             WindowStyle = WindowStyle.None; ResizeMode = ResizeMode.NoResize;
             AllowsTransparency = true; Background = Brushes.Transparent;
             ShowInTaskbar = false; Topmost = true;
@@ -35,6 +40,25 @@ namespace ScreenLine
             heading.MouseLeftButtonDown += delegate(object sender, MouseButtonEventArgs args) { if (args.OriginalSource is TextBlock) DragMove(); };
             body.Children.Add(heading);
             body.Children.Add(new TextBlock { Text = "绳子与夹子整套切换", FontSize = 12, Foreground = LightTheme.Brush("#65717F"), Margin = new Thickness(0, 0, 0, 18) });
+            var styleRow = new Grid { Margin = new Thickness(0, 0, 0, 18) };
+            styleRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(96) });
+            styleRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            styleRow.Children.Add(new TextBlock { Text = "夹子样式", FontSize = 12, Foreground = LightTheme.Brush("#65717F"), VerticalAlignment = VerticalAlignment.Center });
+            var styleButtons = new StackPanel { Orientation = Orientation.Horizontal };
+            portraitButton = LightTheme.Button("角色头像", delegate { ChooseStyle(false); });
+            vectorButton = LightTheme.Button("原版夹子", delegate { ChooseStyle(true); });
+            vectorButton.Margin = new Thickness(8, 0, 0, 0);
+            System.Windows.Automation.AutomationProperties.SetAutomationId(portraitButton, "clip-style-portrait");
+            System.Windows.Automation.AutomationProperties.SetAutomationId(vectorButton, "clip-style-vector");
+            if (ClipArt.Available == 0)
+            {
+                portraitButton.IsEnabled = false;
+                portraitButton.ToolTip = new ToolTip { Content = "当前程序没有内置角色图，把图片放进 yourclip\\images 后重新生成素材", Style = LightTheme.HintStyle };
+            }
+            styleButtons.Children.Add(portraitButton); styleButtons.Children.Add(vectorButton);
+            Grid.SetColumn(styleButtons, 1); styleRow.Children.Add(styleButtons);
+            body.Children.Add(styleRow);
+            UpdateStyleButtons();
             var choices = new WrapPanel();
             foreach (var theme in LineTheme.All)
             {
@@ -62,8 +86,30 @@ namespace ScreenLine
 
         void Select(LineTheme theme)
         {
+            current = theme;
             apply(theme);
             Selected(theme);
+        }
+
+        void ChooseStyle(bool vector)
+        {
+            if (gallery.Store.State.VectorClips != vector)
+            {
+                gallery.Store.State.VectorClips = vector;
+                gallery.Store.Save();
+                ClipArt.Enabled = !vector;
+                UpdateStyleButtons();
+            }
+            apply(current);
+        }
+
+        void UpdateStyleButtons()
+        {
+            bool vector = gallery.Store.State.VectorClips;
+            portraitButton.Tag = vector ? null : "primary";
+            vectorButton.Tag = vector ? "primary" : null;
+            System.Windows.Automation.AutomationProperties.SetItemStatus(portraitButton, vector ? "" : "已选择");
+            System.Windows.Automation.AutomationProperties.SetItemStatus(vectorButton, vector ? "已选择" : "");
         }
 
         void Selected(LineTheme theme)

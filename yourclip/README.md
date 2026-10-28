@@ -3,27 +3,41 @@
 这是 [PicRope · 图绳](https://github.com/Renly1994/PicRope) 的个人分支：在**不改动上游逻辑**的前提下，
 把绳子上挂图片用的夹子、以及桌面贴图的图钉，换成一排角色头像（每张照片按顺序取一个）。
 
-不想要角色图也完全没问题：读到 `src\assets\basket-clip*.png` 一张都没有时，
-程序会自动退回作者原本的矢量夹子和图钉，和上游一模一样。
+不想要角色图也完全没问题：在外观面板里点「原版夹子」即可整体切回，
+或者让 `src\assets\basket-clip*.png` 一张都不存在（程序自动回退到作者原本的矢量外观）。
 
 ## 目录约定
 
 | 位置 | 作用 |
 | --- | --- |
-| `yourclip\images\` | **唯一一份**原始角色图（高清、透明背景），提交进仓库 |
+| `yourclip\images\` | 原始角色图（高清、透明背景），唯一源文件 |
 | `yourclip\make-clip-assets.ps1` | 把原图生成为可内嵌的 384×384 素材 |
 | `yourclip\README.md` | 本说明 |
 | `tools\sync.ps1` | 同步上游更新 |
-| `src\ClipArt.cs` 等 4 个源码文件 | 让夹子/图钉支持角色图（见文末清单） |
+| `src\assets\basket-clip*.png` | 生成的 384×384 素材，**已提交**，所以 clone 后直接构建就有角色图 |
+| `src\ClipArt.cs` 等 5 个源码文件 | 让夹子/图钉支持角色图并可切换（见文末清单） |
 
-`src\assets\basket-clip*.png` 是**生成物**，不进仓库（避免同一张图存两份）。
-所以刚 clone 下来时，先跑一次生成脚本，否则表现为原版矢量夹子。
+改了 `yourclip\images\` 里的图之后，要重新跑一次生成脚本，否则 `src\assets` 里还是旧的。
 
 ## 效果
 
 - 照片按顺序轮换角色；同一张照片在绳子上和在桌面贴图上用的是**同一个角色**
 - 角色"手扒在照片上沿"，向上溢出卡片画布，所以**不需要修改挂点和点击热区**
 - 文字信封上的夹子保持作者原本的矢量样式（`UsePortrait = false`）
+
+## 切换夹子样式
+
+托盘菜单 →「外观」，面板顶部有「夹子样式」一行：
+
+| 选项 | 效果 |
+| --- | --- |
+| **角色头像**（默认） | 绳上的夹子与桌面贴图的图钉都是角色 |
+| 原版夹子 | 完全回退成作者的矢量夹子与图钉，与官方版一致 |
+
+**热切换，不需要重启**：点一下，绳子上的图、桌面贴图、飞行动画里的夹子立刻全部切换。
+选择保存在设置里（`data` 目录），重启后保持。
+
+如果程序里没有内置角色图，「角色头像」按钮会置灰并给出提示。
 
 ## 换成你自己的图（三步）
 
@@ -87,13 +101,29 @@
 > git checkout with_yourclip; git rebase main
 > ```
 
-## ⚠️ 关于应用内自动更新
+## 应用内自动更新
 
-程序内置的更新器盯的是**作者官方仓库**。点「下载并安装」会用官方安装包整包覆盖，
-角色图随之消失（源码仍在，重新 `.\build.ps1` 即可恢复）。自己编译使用时不要点它。
+更新源已改指向**本仓库**（`src\AppUpdates.cs` 里的 `Repository` / `Endpoint`），
+所以点「下载并安装」不会再把作者官方版装进来、覆盖掉角色图。
+
+自己发版时要遵守原作者定义的三条校验，否则更新器会拒绝：
+
+1. 版本号（`AssemblyInformationalVersion`）必须是 `x.y.z`
+2. Release 里的安装包必须叫 `PicRope-<版本>-windows-x64.zip`
+3. 该 assets 必须带 GitHub 计算的 `sha256:` 摘要（正常上传即有）
 
 另外程序是单实例的：运行新编译的 exe 前，先退出旧实例，或执行
 `.\build\PicRope.exe --quit`（`sync.ps1` 会自动处理）。
+
+## 发版
+
+```powershell
+.\build.ps1 -Package
+```
+
+产出 `releases\PicRope-<版本>-windows-x64.zip`（约 2.6 MB，角色图已内嵌在 exe 里）
+和同名 `.sha256`。在 GitHub 上新建 Release、tag 用 `v<版本>`，上传这个 zip 即可，
+用户下载后双击 `Install.cmd` 安装，不需要编译。
 
 ## 素材与许可
 
@@ -107,8 +137,11 @@
 
 | 文件 | 改动 |
 | --- | --- |
-| `src\ClipArt.cs` | 新增：按 `PicRope.Basket.clip1..N` 加载角色图，缺图返回 `null` |
+| `src\ClipArt.cs` | 新增：按 `PicRope.Basket.clip1..N` 加载角色图；`Enabled` 控制整体回退 |
 | `src\ClothesClip.cs` | 夹子支持角色模式（`UsePortrait`），保留原矢量分支 |
 | `src\Thumbtack.cs` | 图钉支持角色模式，与绳子上的角色同序 |
-| `src\ShelfWindow.cs` | **仅 1 行**：信封的夹子关闭角色模式 |
+| `src\AppearanceWindow.cs` | 外观面板新增「夹子样式」一行（热切换） |
+| `src\Core.cs` | 新增设置项 `VectorClips` |
+| `src\ShelfWindow.cs` | 2 行：信封夹子关角色模式；启动时应用夹子样式 |
+| `src\AppUpdates.cs` | 2 行：更新源指向本仓库 |
 | `yourclip\`、`tools\` | 素材、生成脚本、同步脚本、本说明 |
